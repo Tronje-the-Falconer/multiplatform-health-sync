@@ -2,7 +2,7 @@
 <html>
     <meta http-equiv="content-type" content="text/html;  charset=utf-8">
     <head>
-        <title>Pi-Ager</title>
+        <title>multiplatform-health-sync</title>
         <meta charset="UTF-8" />
     </head>
     <body>
@@ -21,5 +21,6 @@
     </body>
 </html>
 
+<?php
     shell_exec('sudo /var/sudowebscript.sh run_healthsync  > /dev/null 2>&1 &');
 ?>
