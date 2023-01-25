@@ -49,9 +49,9 @@ if (intervals_diastolic_field == ''):
 intervals_systolic_field = os.getenv('intervals_systolic_field')
 if (intervals_systolic_field == ''):
     intervals_systolic_field = None
-intervals_temp_field = os.getenv('intervals_temp_field')
-if (intervals_temp_field == ''):
-    intervals_temp_field = None
+intervals_temperature_field = os.getenv('intervals_temperature_field')
+if (intervals_temperature_field == ''):
+    intervals_temperature_field = None
 intervals_steps_field = os.getenv('intervals_steps_field')
 if (intervals_steps_field == ''):
     intervals_steps_field = None
