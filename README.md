@@ -1,2 +1,2 @@
-# multiplattformhealthsync
-sync health values with multiple Plattforms for example withings, intervals.icu, garmin, strava
+# multiplatform-health-sync
+synchronise health values with multiple platforms for example withings, intervals.icu, garmin, strava
