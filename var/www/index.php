@@ -1,16 +1,25 @@
-echo '<form  method="post" name="boot">';
-    echo '<table style="width: 100%;">';
-      echo '<tr>';
-        echo '<td>weight in kg: </td>';
-        echo '<td><input type="number" style="width: 35%;" min="0" max="200" name="weight"></td>';
-      echo '</tr></tr>';
-        echo '<td>bodyfat in %: </td>';
-        echo '<td><input type="number" style="width: 35%;" min="0" max="200" name="bodyfat"></td>';
-      echo '</tr>';
-  echo '</table>';
-echo '</form>';
+<!DOCTYPE html>
+<html>
+    <meta http-equiv="content-type" content="text/html;  charset=utf-8">
+    <head>
+        <title>Pi-Ager</title>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <form  method="post" name="boot">
+            <table style="width: 100%;">
+                <tr>
+                    <td>weight in kg: </td>
+                    <td><input type="number" style="width: 35%;" min="0" max="200" name="weight"></td>
+                </tr></tr>
+                    <td>bodyfat in %: </td>
+                    <td><input type="number" style="width: 35%;" min="0" max="200" name="bodyfat"></td>
+                </tr>
+            </table>
+            <button class="art-button" name="synchronize"  value="synchronize" onclick="return confirm("attention: sync all values");">synchronize</button>';
+        </form>
+    </body>
+</html>
 
-echo'<button class="art-button" name="synchronize"  value="synchronize" onclick="return confirm("attention: sync all values");">synchronize</button>';
-
-
-shell_exec('sudo /var/sudowebscript.sh run_healthsync  > /dev/null 2>&1 &');
+    shell_exec('sudo /var/sudowebscript.sh run_healthsync  > /dev/null 2>&1 &');
+?>
