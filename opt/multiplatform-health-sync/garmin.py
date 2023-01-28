@@ -2,24 +2,16 @@
 """
     garmin.com
 """
-
-
-import datetime
-import json
-import logging
 import os
 import sys
 
+import datetime
+import json
 import requests
 import pwinput
 import readchar
 
-from garminconnect import (
-    Garmin,
-    GarminConnectAuthenticationError,
-    GarminConnectConnectionError,
-    GarminConnectTooManyRequestsError,
-)
+from garminconnect import (Garmin, GarminConnectAuthenticationError, GarminConnectConnectionError, GarminConnectTooManyRequestsError)
 
 import config
 
@@ -99,10 +91,10 @@ def init_api(email, password):
 
     try:
         ## Try to load the previous session
-        with open("session.json") as f:
+        with open(config.garmin_cfg) as f:
             saved_session = json.load(f)
 
-            #print("Login to Garmin Connect using session loaded from 'session.json'...\n")
+            #print("Login to Garmin Connect using session loaded from 'config.garmin_cfg'...\n")
 
             # Use the loaded session for initializing the API (without need for credentials)
             api = Garmin(session_data=saved_session)
@@ -122,7 +114,7 @@ def init_api(email, password):
             api.login()
 
             # Save session dictionary to json file for future use
-            with open("session.json", "w", encoding="utf-8") as f:
+            with open(config.garmin_cfg, "w", encoding="utf-8") as f:
                 json.dump(api.session_data, f, ensure_ascii=False, indent=4)
         except (
             GarminConnectConnectionError,

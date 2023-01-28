@@ -8,13 +8,13 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 from datetime import datetime, timedelta
-
+import time
 
 import config
 
-def readvalues(delta):
+def readvalues(delta, token):
     # authorize or refresh
-    access_token = refresh(json.load(open(config.withings_cfg))) if os.path.isfile(config.withings_cfg) else authenticate()
+    access_token = refresh(json.load(open(config.withings_cfg))) if os.path.isfile(config.withings_cfg) else authenticate(token)
     
     wellness_delta = {}
     current_day = datetime.fromtimestamp(time.time()).date()
@@ -45,10 +45,10 @@ def readvalues(delta):
     
     return wellness_delta, values_current_day
 
-def authenticate():
-    if len(sys.argv) > 1:
+def authenticate(token):
+    if token != None:
         res = requests.post('%s/oauth2' % config.withings_api, params = {
-            'action': 'requesttoken', 'code': sys.argv[1],
+            'action': 'requesttoken', 'code': token,
             'client_id': config.withings_client_id, 'client_secret': config.withings_client_secret,
             'grant_type': 'authorization_code',
             'redirect_uri': config.withings_redirect_uri,

@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """
-    healthvalues sync
+    This program synchronizes health values from different plattforms like withings.com and garmin connect to intervals.icu, strava, etc.
+    You can enter it by commandline with the parameters below for manual values or if checked in the env.env use the services.
+    There is also a website availiable where you can enter your current values, which is running this script with these. raspberry
 """
 ######################################################
 # config section 
@@ -9,8 +11,6 @@ import os
 import sys
 
 import json
-import requests
-import webbrowser
 from datetime import datetime, timedelta
 import time
 import argparse
@@ -18,20 +18,27 @@ import argparse
 import config
 import withings
 import garmin
-import matlab
 import intervals
-
-
+import strava
+import wahoo
+import matlab
 
 def get_script_arguments():
-    argParser = argparse.ArgumentParser()
+    print('reading script arguments ...')
+    argParser = argparse.ArgumentParser(description=__doc__ , epilog="You can find the current Version and more informations on GitHub: https://github.com/Tronje-the-Falconer/multiplatform-health-sync")
     # argParser.add_argument("-n", "--name", help="your name")
     # argParser.add_argument("-i", "--int", type=int, help="your numeric age ")
+    # argParser.add_argument("-h", "--help", , help="this helptext is displayed")
     argParser.add_argument("-m", "--mood", type=int, help="todays mood 1-4 scale where 1 is good and 4 is bad")
     argParser.add_argument("-s", "--stress", type=int, help="todays stress 1-4 scale where 1 is good and 4 is bad")
     argParser.add_argument("-f", "--fatigue", type=int, help="todays fatigue pre training 1-4 scale where 1 is good and 4 is bad")
     argParser.add_argument("-w", "--weight", type=float, help="todays weight in kg")
     argParser.add_argument("-bf", "--bodyfat", type=float, help="todays bodyfat in %")
+    argParser.add_argument("-t", "--temperature", type=float, help="todays temperature in °C")
+    argParser.add_argument("-sy", "--systolic", type=int, help="todays systolic")
+    argParser.add_argument("-di", "--diastolic", type=int, help="todays diastolic")
+    argParser.add_argument("-wt", "--withingstoken", type=str, help="authentication-token from withings for first authentification (url-parameter)")
+    argParser.add_argument("-st", "--stravatoken", type=str, help="authentication-token from strava for first authentification (url-parameter)")
     
     user_manual_values = argParser.parse_args()
     
@@ -42,6 +49,8 @@ def get_script_arguments():
 ## Start of Main Script
 ######################################################
 def main():
+    ##reading data
+    print ('reading data ...')
     today = datetime.fromtimestamp(time.time()).date()
     yesterday = datetime.today().date() - timedelta(1)
     
@@ -68,13 +77,29 @@ def main():
         user_weight_today = user_manual_values.weight
     except KeyError:
         user_weight_today = None
-    
+    try:
+        user_temperature_today = user_manual_values.temperature
+    except KeyError:
+        user_temperature_today = None
+    try:
+        user_systolic_today = user_manual_values.systolic
+    except KeyError:
+        user_systolic_today = None
+    try:
+        user_diastolic_today = user_manual_values.diastolic
+    except KeyError:
+        user_diastolic_today = None
+    # tokens
+    try:
+        withingstoken = user_manual_values.withingstoken
+    except Keyerror:
+        withingstoken = None
 ###### withings.com
     if config.use_service_withings =='True':
         # read withings
         print('reading withings.com values ...')
-        
-        result_withings_values = withings.readvalues(config.withings_delta) # values of the last delta days
+
+        result_withings_values = withings.readvalues(config.withings_delta, withingstoken) # values of the last delta days
         withings_values = result_withings_values[0]
         withings_values_today = result_withings_values[1]
         
@@ -82,46 +107,34 @@ def main():
             try:
                 user_weight_today = withings_values_today['weight']
             except KeyError:
-                print('weight is unknown.')
-                user_weight_today = None
+                print('withings weight is unknown.')
         if user_bodyfat_today == None:
             try:
                 user_bodyfat_today = withings_values_today['bodyfat']
             except KeyError:
-                print('bodyfat is unknown.')
-                user_bodyfat_today = None
-        try:
-            user_diastolic = withings_values_today['diastolic']
-        except KeyError:
-            print('diastolic is unknown.')
-            user_diastolic = None
-        try:
-            user_systolic = withings_values_today['systolic']
-        except KeyError:
-            print('systolic is unknown.')
-            user_systolic = None
-        try:
-            user_temperature = withings_values_today['temperature']
-        except KeyError:
-            print('temperature is unknown.')
-            user_temperature = None
-        
+                print('withings bodyfat is unknown.')
+        if user_diastolic_today == None:
+            try:
+                user_diastolic_today = withings_values_today['diastolic']
+            except KeyError:
+                print('withings diastolic is unknown.')
+        if user_systolic_today == None:
+            try:
+                user_systolic_today = withings_values_today['systolic']
+            except KeyError:
+                print('withings systolic is unknown.')
+        if user_temperature_today == None:
+            try:
+                user_temperature_today = withings_values_today['temperature']
+            except KeyError:
+                print('withings temperature is unknown.')
+        print('reading withings done.')
     else:
         print('withings.com is not used ...')
     
 ###### garmin connect
     if config.use_service_garmin:
         print('reading garmin connect values ...')
-        
-        
-        # VO2Max
-        # Training Advice
-        
-        #manuell
-        # Fatigue
-        # stress
-        # mood
-        
         ## today values
         garmin_today_values = garmin.read_value(today,'7')
         try:
@@ -193,16 +206,12 @@ def main():
         except KeyError:
             print('restingHeartRate is unknown.')
             user_restingHeartRate_yesterday = None
+        print ('reading garmin connect done')
     else:
         print('garmin connect is not used ...')
     
-###### matlab
-#    if config.use_service_matlab == 'True':
-#        print('starting script on matlab ...')
-#        matlab.runImReady4()
-#    else:
-#        print('matlab is not used ...')
-    
+    ## writing data
+    print('writing data ...')
 ###### intervals.icu
     if config.use_service_intervals == 'True':
         print('writing values to intervals.icu ...')
@@ -214,12 +223,12 @@ def main():
             intervals_today_data[config.intervals_weight_field] = user_weight_today
         if user_bodyfat_today and config.intervals_bodyfat_field:
             intervals_today_data[config.intervals_bodyfat_field] = user_bodyfat_today
-        if user_diastolic and config.intervals_diastolic_field:
-            intervals_today_data[config.intervals_diastolic_field] = user_diastolic
-        if user_systolic and config.intervals_systolic_field:
-            intervals_today_data[config.intervals_systolic_field] = user_systolic
-        if user_temperature and config.intervals_temperature_field:
-            intervals_today_data[config.intervals_temperature_field] = user_temperature
+        if user_diastolic_today and config.intervals_diastolic_field:
+            intervals_today_data[config.intervals_diastolic_field] = user_diastolic_today
+        if user_systolic_today and config.intervals_systolic_field:
+            intervals_today_data[config.intervals_systolic_field] = user_systolic_today
+        if user_temperature_today and config.intervals_temperature_field:
+            intervals_today_data[config.intervals_temperature_field] = user_temperature_today
         if user_sleepTimeseconds_today and config.intervals_sleepTimeseconds_field:
             intervals_today_data[config.intervals_sleepTimeseconds_field] = user_sleepTimeseconds_today
         if user_deepSleepSeconds_today and config.intervals_deepSleepSeconds_field:
@@ -269,23 +278,35 @@ def main():
         intervals.set_wellness(intervals_today_data, today)
         print (intervals_yesterday_data)
         intervals.set_wellness(intervals_yesterday_data, yesterday)
+        print ('writing to intervals.icu done')
     else:
         print('intervals.icu is not used ...')
 
-    # if use_service_wahoo('True'):
-        # Get Wahoo_access_token or refresh the token
-        # wahoo_access_token = wahoo_refresh(json.load(open(wahoo_cfg))) if os.path.isfile(wahoo_cfg) else wahoo_authenticate()
-        # wahoo_user_info = get_wahoo_user( wahoo_access_token)
-        # print('Retreived Wahoo userid %s for %s %s' % (wahoo_user_info['id'], wahoo_user_info['first'], wahoo_user_info['last']))
-        # set_wahoo_user_weight( wahoo_access_token, user_weight_today)
-    # else:
-        # print('wahoo is not used...')
+    if config.use_service_wahoo =='True':
+        print ('writing to wahoo ...')
+        wahoo.write_to_wahoo(user_weight_today)
+        print ('writing to wahoo done')
+    else:
+        print('wahoo is not used...')
 
-#    if use_service_strava('True'):
-#        print('writing values to strava.com ...')
-#        strava.write_to_strava(user_weight_today)
+    if config.use_service_strava == 'True':
+        print('writing values to strava.com ...')
+        strava.write_to_strava(user_weight_today)
+    else:
+        print('strava is not used ...')
+
+    ## execute external scripts
+    print('running external scripts ...')
+###### matlab
+#    if config.use_service_matlab == 'True':
+#        print('starting script on matlab ...')
+#        matlab.runImReady4()
 #    else:
-#        print('strava is not used ...')
+#        print('matlab is not used ...')
+    
+    print('all done!')
+
+ 
 
 def convert(seconds): 
             return time.strftime("%H:%M:%S", time.gmtime(seconds)) 

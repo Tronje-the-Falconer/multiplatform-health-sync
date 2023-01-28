@@ -4,10 +4,8 @@
 """
 import os
 import sys
-import json
-import requests
-from requests.auth import HTTPBasicAuth
-from datetime import datetime, timedelta
+
+
 from dotenv import load_dotenv
 
 dotenv_path = os.path.join(os.path.dirname(__file__), 'env.env')
@@ -98,7 +96,7 @@ if (intervals_fatigue_field == ''):
 ## Strava api credentials
 strava_athlete_id = os.getenv('strava_athlete_id')
 strava_client_secret = os.getenv('strava_client_secret')
-strava_cfg='strava.json'
+strava_cfg=os.path.join(os.path.dirname(__file__), 'strava.json')
 strava_url='https://www.strava.com/oauth'
 strava_api='https://www.strava.com/api/v3'
 
@@ -107,9 +105,10 @@ wahoo_client_id = os.getenv('wahoo_client_id')
 wahoo_secret = os.getenv('wahoo_secret')
 wahoo_redirect_uri = os.getenv('wahoo_redirect_uri')
 wahoo_api='https://api.wahooligan.com'
-wahoo_cfg='wahoo.json'
+wahoo_cfg=os.path.join(os.path.dirname(__file__), 'wahoo.json')
 wahoo_scopes='user_write+email+workouts_read+workouts_write+power_zones_read+power_zones_write+offline_data+user_read'
 
 ## Garmin credentials
 garmin_email = os.getenv('garmin_email')
 garmin_password = os.getenv('garmin_password')
+garmin_cfg=os.path.join(os.path.dirname(__file__), 'garmin.json')
