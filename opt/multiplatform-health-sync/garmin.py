@@ -16,6 +16,8 @@ from garminconnect import (Garmin, GarminConnectAuthenticationError, GarminConne
 import config
 
 def init(day):
+    global result
+    result = None
     # Load environment variables if defined
     email = os.getenv("garmin_email")
     password = os.getenv("garmin_password")
@@ -122,7 +124,8 @@ def init_api(email, password):
             GarminConnectTooManyRequestsError,
             requests.exceptions.HTTPError,
         ) as err:
-            logger.error("Error occurred during Garmin Connect communication: %s", err)
+            # logger.error("Error occurred during Garmin Connect communication: %s", err)
+            print("Error occurred during Garmin Connect communication: %s", err)
             return None
 
     return api
@@ -339,7 +342,8 @@ def switch(api, i, day):
             GarminConnectTooManyRequestsError,
             requests.exceptions.HTTPError,
         ) as err:
-            logger.error("Error occurred: %s", err)
+            # logger.error("Error occurred: %s", err)
+            print("Error occurred: %s", err)
         except KeyError:
             # Invalid menu option chosen
             pass
@@ -362,7 +366,9 @@ def read_value(day, option):
     # Display menu
     #print_menu()
     #option = readchar.readkey()
-
+    if result == None:
+        print ("something wrong. result is None!")
+        result = {}
     return result
     # while True:
         # # Display header and login

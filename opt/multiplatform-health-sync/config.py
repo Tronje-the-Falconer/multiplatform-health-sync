@@ -92,6 +92,33 @@ if (intervals_mood_field == ''):
 intervals_fatigue_field = os.getenv('intervals_fatigue_field')
 if (intervals_fatigue_field == ''):
     intervals_fatigue_field = None
+intervals_floors_field = os.getenv('intervals_floors_field')
+if (intervals_floors_field == ''):
+    intervals_floors_field = None
+intervals_alcohol_field = os.getenv('intervals_alcohol_field')
+if (intervals_alcohol_field == ''):
+    intervals_alcohol_field = None
+intervals_averageRespiration_field = os.getenv('intervals_averageRespiration_field')
+if (intervals_averageRespiration_field == ''):
+    intervals_averageRespiration_field = None
+intervals_StressScore_field = os.getenv('intervals_StressScore_field')
+if (intervals_StressScore_field == ''):
+    intervals_StressScore_field = None
+intervals_consumedCalories_field = os.getenv('intervals_consumedCalories_field')
+if (intervals_consumedCalories_field == ''):
+    intervals_consumedCalories_field = None
+intervals_activeCalories_field = os.getenv('intervals_activeCalories_field')
+if (intervals_activeCalories_field == ''):
+    intervals_activeCalories_field = None
+intervals_netCalorieGoal_field = os.getenv('intervals_netCalorieGoal_field')
+if (intervals_netCalorieGoal_field == ''):
+    intervals_netCalorieGoal_field = None
+intervals_CalorieGoal_field = os.getenv('intervals_CalorieGoal_field')
+if (intervals_CalorieGoal_field == ''):
+    intervals_CalorieGoal_field = None
+intervals_GoalConsumedDifferenceCalories_field = os.getenv('intervals_GoalConsumedDifferenceCalories_field')
+if (intervals_GoalConsumedDifferenceCalories_field == ''):
+    intervals_GoalConsumedDifferenceCalories_field = None
 
 ## Strava api credentials
 strava_athlete_id = os.getenv('strava_athlete_id')

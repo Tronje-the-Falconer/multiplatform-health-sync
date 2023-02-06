@@ -39,6 +39,7 @@ def get_script_arguments():
     argParser.add_argument("-di", "--diastolic", type=int, help="todays diastolic")
     argParser.add_argument("-wt", "--withingstoken", type=str, help="authentication-token from withings for first authentification (url-parameter)")
     argParser.add_argument("-st", "--stravatoken", type=str, help="authentication-token from strava for first authentification (url-parameter)")
+    argParser.add_argument("-a", "--alcohol", type=str, help="yesterdays alcohol intake  1-4 scale where 1 is none and 4 is excessive")
     
     user_manual_values = argParser.parse_args()
     
@@ -60,9 +61,9 @@ def main():
     except Keyerror:
         user_mood_today = None
     try:
-        user_stress_today = user_manual_values.stress
+        user_stress_yesterday = user_manual_values.stress
     except KeyError:
-        user_stress_today = None
+        user_stress_yesterday = None
     try:
         user_fatigue_today = user_manual_values.fatigue
     except KeyError:
@@ -94,6 +95,10 @@ def main():
         withingstoken = user_manual_values.withingstoken
     except Keyerror:
         withingstoken = None
+    try:
+        user_alcohol_yesterday = user_manual_values.alcohol
+    except Keyerror:
+        user_alcohol_yesterday = None
 ###### withings.com
     if config.use_service_withings =='True':
         # read withings
@@ -144,7 +149,12 @@ def main():
             user_restingHeartRate_today = None
         
         garmin_today_sleep_values = garmin.read_value(today,'c')
-        garmin_today_sleepdata_values = garmin_today_sleep_values['dailySleepDTO']
+        try:
+            garmin_today_sleepdata_values = garmin_today_sleep_values['dailySleepDTO']
+        except KeyError:
+            print('daily Sleep Values not found.')
+            garmin_today_sleepdata_values = None
+        
         try:
             user_sleepTimeseconds_today = garmin_today_sleepdata_values['sleepTimeSeconds']
         except KeyError:
@@ -206,6 +216,37 @@ def main():
         except KeyError:
             print('restingHeartRate is unknown.')
             user_restingHeartRate_yesterday = None
+        try:
+            user_floors_yesterday = garmin_yesterday_values['floorsAscended']
+        except KeyError:
+            print('floors are unknown.')
+            user_floors_yesterday = None
+        try:
+            user_averageStressLevel_yesterday = garmin_yesterday_values['averageStressLevel']
+        except KeyError:
+            print('average Stresslevel is unknown.')
+            user_averageStressLevel_yesterday = None
+        try:
+            user_averageRespirationValue_yesterday = garmin_yesterday_values['avgWakingRespirationValue']
+        except KeyError:
+            print('average Respiration is unknown.')
+            user_averageRespirationValue_yesterday = None
+        try:
+            user_consumedKilocalories_yesterday = garmin_yesterday_values['consumedKilocalories']
+        except KeyError:
+            print('consumed kilocalories are unknown.')
+            user_consumedKilocalories_yesterday = None
+        try:
+            user_activeKilocalories_yesterday = garmin_yesterday_values['activeKilocalories']
+        except KeyError:
+            print('average Respiration is unknown.')
+            user_activeKilocalories_yesterday = None
+        try:
+            user_netCalorieGoal_yesterday = garmin_yesterday_values['netCalorieGoal']
+        except KeyError:
+            print('net calorie-goal is unknown.')
+            user_netCalorieGoal_yesterday = None
+            
         print ('reading garmin connect done')
     else:
         print('garmin connect is not used ...')
@@ -264,14 +305,47 @@ def main():
             intervals_today_data[config.intervals_mood_field] = user_mood_today
         if user_fatigue_today and config.intervals_fatigue_field:
             intervals_today_data[config.intervals_fatigue_field] = user_fatigue_today
-        if user_stress_today and config.intervals_stress_field:
-            intervals_today_data[config.intervals_stress_field] = user_stress_today
         
         # Create dictionary for yesterday
         intervals_yesterday_data = {}
         intervals_yesterday_data["id"] = str(yesterday)
         if user_steps_yesterday:
             intervals_yesterday_data[config.intervals_steps_field] = user_steps_yesterday
+        if user_alcohol_yesterday and config.intervals_alcohol_field:
+            intervals_yesterday_data[config.intervals_alcohol_field] = user_alcohol_yesterday
+        if user_floors_yesterday and config.intervals_floors_field:
+            intervals_yesterday_data[config.intervals_floors_field] = user_floors_yesterday
+        if user_averageStressLevel_yesterday and config.intervals_stress_field: # 0–25: recreation 26–50: low Stress 51–75: avg Stress 76–100: high Stress
+#            try:
+#                if user_averageStressLevel_yesterday <= 25:
+#                    user_stress_yesterday_intervals = 1
+#                elif user_averageStressLevel_yesterday >25 and user_averageStressLevel_yesterday <= 50:
+#                    user_stress_yesterday_intervals = 2
+#                elif user_averageStressLevel_yesterday >50 and user_averageStressLevel_yesterday <= 75:
+#                    user_stress_yesterday_intervals = 3
+#                elif user_averageStressLevel_yesterday >75:
+#                    user_stress_yesterday_intervals = 4
+#            except:
+#                print ('error in calculating stress for intervals')
+#            intervals_yesterday_data[config.intervals_stress_field] = user_stress_yesterday_intervals
+            intervals_yesterday_data[config.intervals_StressScore_field] = user_averageStressLevel_yesterday
+        if user_stress_yesterday and config.intervals_stress_field:
+            intervals_yesterday_data[config.intervals_stress_field] = user_stress_yesterday
+        if user_averageRespirationValue_yesterday and config.intervals_averageRespiration_field:
+            intervals_yesterday_data[config.intervals_averageRespiration_field] = user_averageRespirationValue_yesterday
+        if user_netCalorieGoal_yesterday and config.intervals_netCalorieGoal_field:
+            intervals_yesterday_data[config.intervals_netCalorieGoal_field] = user_netCalorieGoal_yesterday
+        if user_activeKilocalories_yesterday and config.intervals_activeCalories_field:
+            intervals_yesterday_data[config.intervals_activeCalories_field] = user_activeKilocalories_yesterday
+        if user_netCalorieGoal_yesterday and user_activeKilocalories_yesterday and config.intervals_CalorieGoal_field:
+            user_CalorieGoal_yesterday = user_netCalorieGoal_yesterday + user_activeKilocalories_yesterday
+            intervals_yesterday_data[config.intervals_CalorieGoal_field] = user_CalorieGoal_yesterday
+        if user_consumedKilocalories_yesterday and config.intervals_consumedCalories_field:
+            intervals_yesterday_data[config.intervals_consumedCalories_field] = user_consumedKilocalories_yesterday
+        if user_consumedKilocalories_yesterday and user_CalorieGoal_yesterday and config.intervals_GoalConsumedDifferenceCalories_field:
+            user_CaloriesDifference = user_CalorieGoal_yesterday - user_consumedKilocalories_yesterday
+            intervals_yesterday_data[config.intervals_GoalConsumedDifferenceCalories_field] = user_CaloriesDifference
+        
         
         # write data
         print (intervals_today_data)
