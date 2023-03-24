@@ -41,8 +41,11 @@ def readvalues(delta, token):
             data['id'] = day.strftime('%Y-%m-%d')
             if data['id'] == current_day.strftime('%Y-%m-%d'):
                 values_current_day = data
-            
     
+    if not 'values_current_day' in vars():
+        print ('no data for today!')
+        values_current_day = {}
+        
     return wellness_delta, values_current_day
 
 def authenticate(token):
