@@ -10,11 +10,22 @@ import json
 
 import config
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def write_to_wahoo(weight):
     # Get Wahoo_access_token or refresh the token
     wahoo_access_token = wahoo_refresh(json.load(open(config.wahoo_cfg))) if os.path.isfile(config.wahoo_cfg) else wahoo_authenticate()
     wahoo_user_info = get_wahoo_user( wahoo_access_token)
-    print('Retreived Wahoo userid %s for %s %s' % (wahoo_user_info['id'], wahoo_user_info['first'], wahoo_user_info['last']))
+    print('[ i ] Retreived Wahoo userid %s for %s %s' % (wahoo_user_info['id'], wahoo_user_info['first'], wahoo_user_info['last']))
     set_wahoo_user_weight( wahoo_access_token, weight)
 
 
@@ -29,13 +40,14 @@ def set_wahoo_user_weight( token, weight):
     data = {'user[weight]':'%s' % weight}
     res = requests.put( url, headers=headers, data=data)
     if res.status_code != 200:
-        print("There was an error writing to Wahoo API:")
+        print('[' + f'{bcolors.FAIL} \u26A0 {bcolors.ENDC}]{bcolors.FAIL} There was an error writing to Wahoo API: ')
         print( res.json())
+        print('{bcolors.ENDC}')
     else:
-        print("Succesful writing weight to Wahoo API")
+        print("[ i ] Succesful writing weight to Wahoo API")
 
 def wahoo_authenticate():
-    print('No token found, webbrowser will open, authorize the application and copy paste the code section')
+    print('[ i ] No token found, webbrowser will open, authorize the application and copy paste the code section')
     url = '%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s' % ( config.wahoo_api, config.wahoo_client_id,config.wahoo_redirect_uri,config.wahoo_scopes)
     print(url)
     webbrowser.open(url,new=2)
@@ -54,8 +66,9 @@ def wahoo_authenticate():
         json.dump(out, open(config.wahoo_cfg,'w'))
         return out['access_token']
     else:
-        print('authentication failed:')
+        print('[' + f'{bcolors.FAIL} \u26A0 {bcolors.ENDC}]{bcolors.FAIL} authentication failed:')
         print(out)
+        print('{bcolors.ENDC}')
         exit()
 
 def wahoo_refresh(data):

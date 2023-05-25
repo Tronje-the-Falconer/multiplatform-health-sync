@@ -15,6 +15,17 @@ from garminconnect import (Garmin, GarminConnectAuthenticationError, GarminConne
 
 import config
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def init(day):
     global result
     result = None
@@ -96,7 +107,7 @@ def init_api(email, password):
         with open(config.garmin_cfg) as f:
             saved_session = json.load(f)
 
-            #print("Login to Garmin Connect using session loaded from 'config.garmin_cfg'...\n")
+            #print("Login to Garmin Connect using session loaded from ' " + config.garmin_cfg + "...\n")
 
             # Use the loaded session for initializing the API (without need for credentials)
             api = Garmin(session_data=saved_session)
@@ -106,7 +117,7 @@ def init_api(email, password):
 
     except (FileNotFoundError, GarminConnectAuthenticationError):
         # Login to Garmin Connect portal with credentials since session is invalid or not presentlastweek.
-        print("Session file not present or invalid, login with your credentials, please wait...\n")
+        print("[ i ] Session file not present or invalid, login with your credentials, please wait...\n")
         try:
             # Ask for credentials if not set as environment variables
             if not email or not password:
@@ -125,7 +136,7 @@ def init_api(email, password):
             requests.exceptions.HTTPError,
         ) as err:
             # logger.error("Error occurred during Garmin Connect communication: %s", err)
-            print("Error occurred during Garmin Connect communication: %s", err)
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} Error occurred during Garmin Connect communication: {err} {bcolors.ENDC}')
             return None
 
     return api
@@ -343,12 +354,12 @@ def switch(api, i, day):
             requests.exceptions.HTTPError,
         ) as err:
             # logger.error("Error occurred: %s", err)
-            print("Error occurred: %s", err)
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} Error occurred: {err} {bcolors.ENDC}')
         except KeyError:
             # Invalid menu option chosen
             pass
     else:
-        print("Could not login to Garmin Connect, try again later.")
+        print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} Could not login to Garmin Connect, try again later.{bcolors.ENDC}')
 
 # Main program loop
 def read_value(day, option):
@@ -367,7 +378,7 @@ def read_value(day, option):
     #print_menu()
     #option = readchar.readkey()
     if result == None:
-        print ("something wrong. result is None!")
+        print ('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} something wrong. result is None! {bcolors.ENDC}')
         result = {}
     return result
     # while True:

@@ -18,6 +18,23 @@ def write_to_strava(user_weight):
     set_strava_user_weight( strava_access_token, float(user_weight), strava_user_info['id']  )   ## For Strava the user weight must be of type float
 
 def strava_authenticate():
+    '''if len(sys.argv) > 1:
+        paramdata = {
+            'client_id': config.strava_athlete_id,
+            'client_secret': config.strava_client_secret,
+            'code': sys.argv[1],
+            'grant_type': 'authorization_code'
+        }
+        res = requests.post( url = '%s/token' % config.strava_url, data = paramdata)
+        out = res.json()
+        if res.status_code == 200:
+            json.dump(out, open(config.strava_cfg,'w'))
+            return out['access_token']
+        else:
+            print('authentication failed:')
+            print(out)
+            exit()
+    else:'''
     print("No token found, webbrowser will open, authorize the application and copy paste the code section")
     url ='%s/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=profile:write,read' % ( config.strava_url, config.strava_athlete_id)
     print(url)

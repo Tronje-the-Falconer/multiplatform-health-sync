@@ -35,7 +35,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def get_script_arguments():
-    print('reading script arguments ...')
+    print('[...] reading script arguments ...')
     argParser = argparse.ArgumentParser(description=__doc__ , epilog="You can find the current Version and more informations on GitHub: https://github.com/Tronje-the-Falconer/multiplatform-health-sync")
     # argParser.add_argument("-n", "--name", help="your name")
     # argParser.add_argument("-i", "--int", type=int, help="your numeric age ")
@@ -56,13 +56,17 @@ def get_script_arguments():
     
     return user_manual_values
 
+def convert(seconds): 
+            return time.strftime("%H:%M:%S", time.gmtime(seconds)) 
 
 ######################################################
 ## Start of Main Script
 ######################################################
 def main():
+    print(' ')
     ##reading data
-    print ('reading data ...')
+    print ('[>>>] reading data ...')
+
     today = datetime.fromtimestamp(time.time()).date()
     yesterday = datetime.today().date() - timedelta(1)
     
@@ -113,58 +117,58 @@ def main():
 ###### withings.com
     if config.use_service_withings =='True':
         # read withings
-        print('reading withings.com values ...')
+        print('[...] reading withings.com values ...')
 
         result_withings_values = withings.readvalues(config.withings_delta, withingstoken) # values of the last delta days
         if result_withings_values == None:
             result_withings_values = {}
-            print(f'{bcolors.FAIL}Fail: No withings result!{bcolors.ENDC}')
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} No withings result!{bcolors.ENDC}')
         try:
             withings_values = result_withings_values[0]
             withings_values_today = result_withings_values[1]
         except KeyError:
             withings_values = {}
             withings_values_today = {}
-            print(f'{bcolors.FAIL}Fail: No withings values!{bcolors.ENDC}')
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} No withings values!{bcolors.ENDC}')
             
         if user_weight_today == None:
             try:
                 user_weight_today = withings_values_today['weight']
             except KeyError:
-                print(f'{bcolors.WARNING}Warning: withings weight is unknown.{bcolors.ENDC}')
+                print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING}withings weight is unknown.{bcolors.ENDC}')
         if user_bodyfat_today == None:
             try:
                 user_bodyfat_today = withings_values_today['bodyfat']
             except KeyError:
-                print(f'{bcolors.WARNING}Warning: withings bodyfat is unknown.{bcolors.ENDC}')
+                print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} withings bodyfat is unknown.{bcolors.ENDC}')
         if user_diastolic_today == None:
             try:
                 user_diastolic_today = withings_values_today['diastolic']
             except KeyError:
-                print(f'{bcolors.WARNING}Warning: withings diastolic is unknown.{bcolors.ENDC}')
+                print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} withings diastolic is unknown.{bcolors.ENDC}')
         if user_systolic_today == None:
             try:
                 user_systolic_today = withings_values_today['systolic']
             except KeyError:
-                print(f'{bcolors.WARNING}Warning: withings systolic is unknown.{bcolors.ENDC}')
+                print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} withings systolic is unknown.{bcolors.ENDC}')
         if user_temperature_today == None:
             try:
                 user_temperature_today = withings_values_today['temperature']
             except KeyError:
-                print(f'{bcolors.WARNING}Warning: withings temperature is unknown.{bcolors.ENDC}')
-        print(f'{bcolors.OKGREEN}  \u2713  {bcolors.ENDC} {bcolors.OKBLUE}reading withings done.{bcolors.ENDC}')
+                print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} withings temperature is unknown.{bcolors.ENDC}')
+        print('[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE}reading withings done.{bcolors.ENDC}')
     else:
-        print('withings.com is not used ...')
+        print('[ i ] withings.com is not used ...')
     
 ###### garmin connect
     if config.use_service_garmin:
-        print('reading garmin connect values ...')
+        print('[...] reading garmin connect values ...')
         ## today values
         garmin_today_values = garmin.read_value(today,'7')
         try:
             user_restingHeartRate_today = garmin_today_values['restingHeartRate']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin restingHeartRate is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin restingHeartRate is unknown.{bcolors.ENDC}')
             user_restingHeartRate_today = None
         
         time.sleep(3)
@@ -173,58 +177,62 @@ def main():
             garmin_today_sleepdata_values = garmin_today_sleep_values['dailySleepDTO']
             if garmin_today_sleepdata_values == None:
                 garmin_today_sleepdata_values = {}
-                print(f'{bcolors.FAIL}Fail: garmin no today sleepdata!{bcolors.ENDC}')
+                print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} garmin no today sleepdata!{bcolors.ENDC}')
         except KeyError:
-            print(f'{bcolors.FAIL}Fail: garmin daily Sleep Values not found.{bcolors.ENDC}')
-            garmin_today_sleepdata_values = None
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} garmin daily Sleep Values not found.{bcolors.ENDC}')
+            garmin_today_sleepdata_values = {}
         
         try:
             user_sleepTimeseconds_today = garmin_today_sleepdata_values['sleepTimeSeconds']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin sleepTimeSeconds is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin sleepTimeSeconds is unknown.{bcolors.ENDC}')
             user_sleepTimeseconds_today = None
         try:
             user_deepSleepSeconds_today = garmin_today_sleepdata_values['deepSleepSeconds']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin deepSleepSeconds is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin deepSleepSeconds is unknown.{bcolors.ENDC}')
             user_deepSleepSeconds_today = None
         try:
             user_lightSleepSeconds_today = garmin_today_sleepdata_values['lightSleepSeconds']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin lightSleepSeconds is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin lightSleepSeconds is unknown.{bcolors.ENDC}')
             user_lightSleepSeconds_today = None
         try:
             user_remSleepSeconds_today = garmin_today_sleepdata_values['remSleepSeconds']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin remSleepSeconds is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin remSleepSeconds is unknown.{bcolors.ENDC}')
             user_remSleepSeconds_today = None
         try:
             user_awakeSleepSeconds_today = garmin_today_sleepdata_values['awakeSleepSeconds']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin awakeSleepSeconds is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin awakeSleepSeconds is unknown.{bcolors.ENDC}')
             user_awakeSleepSeconds_today = None
         try:
             user_averageSpO2HRSleep_today = garmin_today_sleepdata_values['averageSpO2HRSleep']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin averageSpO2HRSleep is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin averageSpO2HRSleep is unknown.{bcolors.ENDC}')
             user_averageSpO2HRSleep_today = None
         try:
             user_averageSpO2Value_today = garmin_today_sleepdata_values['averageSpO2Value']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin averageSpO2Value is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin averageSpO2Value is unknown.{bcolors.ENDC}')
             user_averageSpO2Value_today = None
-            
-        garmin_today_sleep_values_sleepScores = garmin_today_sleepdata_values['sleepScores']
-        garmin_today_sleep_values_sleepScores_overall = garmin_today_sleep_values_sleepScores['overall']
+        
+        try:        
+            garmin_today_sleep_values_sleepScores = garmin_today_sleepdata_values['sleepScores']
+            garmin_today_sleep_values_sleepScores_overall = garmin_today_sleep_values_sleepScores['overall']
+        except KeyError:
+            print('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} garmin today sleep scores not found.{bcolors.ENDC}')
+            garmin_today_sleep_values_sleepScores_overall = {}
         try:
             user_sleepscore_today = garmin_today_sleep_values_sleepScores_overall['value']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin sleepscore value is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin sleepscore value is unknown.{bcolors.ENDC}')
             user_sleepscore_today = None
         try:
             user_sleepquality_today = garmin_today_sleep_values_sleepScores_overall['qualifierKey']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin sleepquality is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin sleepquality is unknown.{bcolors.ENDC}')
             user_sleepquality_today = None
         
         ## yesterday values
@@ -232,52 +240,52 @@ def main():
         try:
             user_steps_yesterday = garmin_yesterday_values['totalSteps']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin totalSteps is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin totalSteps is unknown.{bcolors.ENDC}')
             user_steps_yesterday = None
         try:
             user_restingHeartRate_yesterday = garmin_yesterday_values['restingHeartRate']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin restingHeartRate is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin restingHeartRate is unknown.{bcolors.ENDC}')
             user_restingHeartRate_yesterday = None
         try:
             user_floors_yesterday = garmin_yesterday_values['floorsAscended']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin floors are unknown is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin floors are unknown is unknown.{bcolors.ENDC}')
             user_floors_yesterday = None
         try:
             user_averageStressLevel_yesterday = garmin_yesterday_values['averageStressLevel']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin average Stresslevel is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin average Stresslevel is unknown.{bcolors.ENDC}')
             user_averageStressLevel_yesterday = None
         try:
             user_averageRespirationValue_yesterday = garmin_yesterday_values['avgWakingRespirationValue']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin average Respiration is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin average Respiration is unknown.{bcolors.ENDC}')
             user_averageRespirationValue_yesterday = None
         try:
             user_consumedKilocalories_yesterday = garmin_yesterday_values['consumedKilocalories']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin consumed kilocalories are unknown. unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin consumed kilocalories are unknown. unknown.{bcolors.ENDC}')
             user_consumedKilocalories_yesterday = None
         try:
             user_activeKilocalories_yesterday = garmin_yesterday_values['activeKilocalories']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin average Respiration is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin average Respiration is unknown.{bcolors.ENDC}')
             user_activeKilocalories_yesterday = None
         try:
             user_netCalorieGoal_yesterday = garmin_yesterday_values['netCalorieGoal']
         except KeyError:
-            print(f'{bcolors.WARNING}Warning: garmin net calorie-goal is unknown.{bcolors.ENDC}')
+            print('[' + f'{bcolors.WARNING} \u26A0 {bcolors.ENDC}]{bcolors.WARNING} garmin net calorie-goal is unknown.{bcolors.ENDC}')
             user_netCalorieGoal_yesterday = None
-        print( f'{bcolors.OKGREEN}  \u2713 {bcolors.ENDC} {bcolors.OKBLUE} reading garmin connect done{bcolors.ENDC}')
+        print( '[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE} reading garmin connect done{bcolors.ENDC}')
     else:
-        print('garmin connect is not used ...')
+        print('[ i ] garmin connect is not used ...')
     
     ## writing data
-    print('writing data ...')
+    print('[>>>] writing data ...')
 ###### intervals.icu
     if config.use_service_intervals == 'True':
-        print('writing values to intervals.icu ...')
+        print('[...] writing values to intervals.icu ...')
         # Write to Intervals.icu
         # Create Dictionary for today
         intervals_today_data = {}
@@ -316,7 +324,7 @@ def main():
                     user_sleepquality_today_intervals = 4
                 intervals_today_data[config.intervals_sleepquality_field] = user_sleepquality_today_intervals
             except:
-                print ('error in transform status to int')
+                print ('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} error in transform status to int')
         if user_averageSpO2HRSleep_today and config.intervals_averageSpO2HRSleep_field:
             intervals_today_data[config.intervals_averageSpO2HRSleep_field] = user_averageSpO2HRSleep_today
         if user_averageSpO2Value_today and config.intervals_averageSpO2Value_field:
@@ -348,7 +356,7 @@ def main():
 #                elif user_averageStressLevel_yesterday >75:
 #                    user_stress_yesterday_intervals = 4
 #            except:
-#                print ('error in calculating stress for intervals')
+#                print ('[' + f'{bcolors.FAIL} \u0078 {bcolors.ENDC}]{bcolors.FAIL} error in calculating stress for intervals')
 #            intervals_yesterday_data[config.intervals_stress_field] = user_stress_yesterday_intervals
             intervals_yesterday_data[config.intervals_StressScore_field] = user_averageStressLevel_yesterday
         if user_stress_yesterday and config.intervals_stress_field:
@@ -370,39 +378,40 @@ def main():
         
         
         # write data
-        print (intervals_today_data)
+        print ('[ i ] today: ' + str(intervals_today_data))
         intervals.set_wellness(intervals_today_data, today)
-        print (intervals_yesterday_data)
+        print ('[ i ] yesterday: ' + str(intervals_yesterday_data))
         intervals.set_wellness(intervals_yesterday_data, yesterday)
-        print(f'{bcolors.OKGREEN}  \u2713  {bcolors.ENDC} {bcolors.OKBLUE}writing to intervals.icu done{bcolors.ENDC}')
+        print('[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE}writing to intervals.icu done{bcolors.ENDC}')
     else:
-        print('intervals.icu is not used ...')
+        print('[ i ] intervals.icu is not used ...')
 
     if config.use_service_wahoo =='True' and user_weight_today is not None:
-        print ('writing to wahoo ...')
+        print ('[...] writing to wahoo ...')
         wahoo.write_to_wahoo(user_weight_today)
-        print(f'{bcolors.OKGREEN}  \u2713  {bcolors.ENDC} {bcolors.OKBLUE}writing to wahoo done{bcolors.ENDC}')
+        print('[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE}writing to wahoo done{bcolors.ENDC}')
     else:
-        print('wahoo is not used... or user weight is None')
+        print('[ i ] wahoo is not used... or user weight is None')
 
     if config.use_service_strava == 'True' and user_weight_today is not None:
-        print('writing values to strava.com ...')
+        print('[...] writing values to strava.com ...')
         
-        print(f'{bcolors.OKGREEN}  \u2713  {bcolors.ENDC} {bcolors.OKBLUE}writing to strava done{bcolors.ENDC}')
+        print('[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE}writing to strava done{bcolors.ENDC}')
     else:
-        print('strava is not used ... or user weight is None')
+        print('[ i ] strava is not used ... or user weight is None')
 
     ## execute external scripts
-    print('running external scripts ...')
+    print('[...] running external scripts ...')
+    
+    print('[' + f'{bcolors.OKGREEN} \u2713 {bcolors.ENDC}] {bcolors.OKBLUE}running external scripts done{bcolors.ENDC}')
 ###### matlab
 #    if config.use_service_matlab == 'True':
-#        print('starting script on matlab ...')
+#        print('[...] starting script on matlab ...')
 #        matlab.runImReady4()
 #    else:
-#        print('matlab is not used ...')
-    print(f'{bcolors.OKGREEN}  \u2713 \u2713 {bcolors.ENDC}{bcolors.OKCYAN}all done{bcolors.ENDC}')
+#        print('[ i ] matlab is not used ...')
+    print('[' + f'{bcolors.OKGREEN}\u2713\u2713 {bcolors.ENDC}] {bcolors.ENDC}{bcolors.OKCYAN}all done{bcolors.ENDC}')
+    return
 
 if __name__ == '__main__': exit(main())
 
-def convert(seconds): 
-            return time.strftime("%H:%M:%S", time.gmtime(seconds)) 
